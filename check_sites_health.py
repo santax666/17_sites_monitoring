@@ -22,6 +22,7 @@ def load_urls4check(path):
 
 def check_http_code(url):
     TIME_WAIT_FOR_RESPONSE = 10
+    HTTP_SERVER_ERROR = 503
     http_codes = [list(range(200, 227)), list(range(300, 308)), [401, 407],
                   [403], [404], list(range(400, 452)), [500], [503],
                   list(range(501, 512)), list(range(100, 103))]
@@ -29,7 +30,7 @@ def check_http_code(url):
         code = requests.get(url, allow_redirects=False,
                             timeout=TIME_WAIT_FOR_RESPONSE).status_code
     except requests.exceptions.Timeout:
-        code = 503
+        code = HTTP_SERVER_ERROR
     return next(i for i, x in enumerate(http_codes) if code in x)
 
 
