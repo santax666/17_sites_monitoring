@@ -39,11 +39,11 @@ def check_expiration_date(url):
     now_date = datetime.datetime.today()
     expire_date = whois.whois(url).expiration_date
     if expire_date is None:
-        return 0
+        return False
     if type(expire_date) == list:
         expire_date = expire_date[0]
     days_count = expire_date - now_date
-    return 0 if days_count.days > DAYS_IN_MONTH else 10
+    return not days_count.days > DAYS_IN_MONTH
 
 
 def check_sites_status(urls_list):
@@ -59,10 +59,10 @@ def check_sites_status(urls_list):
                   '(5xx): Неудачное выполнение запроса по вине сервера',
                   '(1xx): Возвращен код, информирующий о процессе передачи')
     for url in urls_list:
-        state = sum([check_http_code(url), check_expiration_date(url)])
-        if state:
+        http_state = check_http_code(url)
+        expire_state = check_expiration_date(url)
+        if (http_state or expire_state):
             print('{0} - {1}'.format(url, success_state[False]))
-            expire_state, http_state = divmod(state, len(errors_msg))
             if expire_state:
                 print(errors_msg[0])
             if http_state:
